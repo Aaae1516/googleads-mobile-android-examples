@@ -2,15 +2,16 @@ package com.google.android.gms.example.interstitialexample
 
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.InterstitialAd
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import kotlinx.android.synthetic.main.activity_main.*
 
 const val GAME_LENGTH_MILLISECONDS = 3000L
@@ -18,10 +19,11 @@ const val AD_UNIT_ID = "ca-app-pub-3940256099942544/1033173712"
 
 class MainActivity : AppCompatActivity() {
 
-  private lateinit var mInterstitialAd: InterstitialAd
+  private var mInterstitialAd: InterstitialAd? = null
   private var mCountDownTimer: CountDownTimer? = null
   private var mGameIsInProgress = false
   private var mTimerMilliseconds = 0L
+  private var TAG = "MainActivity"
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -40,38 +42,41 @@ class MainActivity : AppCompatActivity() {
         .build()
     )
 
-    // Create the InterstitialAd and set it up.
-    mInterstitialAd = InterstitialAd(this).apply {
-      adUnitId = AD_UNIT_ID
-      adListener = (
-        object : AdListener() {
-          override fun onAdLoaded() {
-            Toast.makeText(this@MainActivity, "onAdLoaded()", Toast.LENGTH_SHORT).show()
-          }
-
-          override fun onAdFailedToLoad(loadAdError: LoadAdError) {
-            val error = "domain: ${loadAdError.domain}, code: ${loadAdError.code}, " +
-              "message: ${loadAdError.message}"
-            Toast.makeText(
-              this@MainActivity,
-              "onAdFailedToLoad() with error $error",
-              Toast.LENGTH_SHORT
-            ).show()
-          }
-
-          override fun onAdClosed() {
-            startGame()
-          }
-        }
-      )
-    }
-
     // Create the "retry" button, which triggers an interstitial between game plays.
     retry_button.visibility = View.INVISIBLE
     retry_button.setOnClickListener { showInterstitial() }
 
     // Kick off the first play of the "game."
     startGame()
+  }
+
+  private fun loadAd() {
+    var adRequest = AdRequest.Builder().build()
+
+    InterstitialAd.load(
+      this, AD_UNIT_ID, adRequest,
+      object : InterstitialAdLoadCallback() {
+        override fun onAdFailedToLoad(adError: LoadAdError) {
+          Log.d(TAG, adError?.message)
+          mInterstitialAd = null
+
+          val error = "domain: ${adError.domain}, code: ${adError.code}, " +
+            "message: ${adError.message}"
+          Toast.makeText(
+            this@MainActivity,
+            "onAdFailedToLoad() with error $error",
+            Toast.LENGTH_SHORT
+          ).show()
+        }
+
+        override fun onAdLoaded(interstitialAd: InterstitialAd) {
+          Log.d(TAG, "Ad was loaded.")
+          mInterstitialAd = interstitialAd
+
+          Toast.makeText(this@MainActivity, "onAdLoaded()", Toast.LENGTH_SHORT).show()
+        }
+      }
+    )
   }
 
   // Create the game timer, which counts down to the end of the level

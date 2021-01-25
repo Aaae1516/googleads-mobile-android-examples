@@ -16,10 +16,10 @@
 package com.google.android.gms.example.adaptivebannerexample;
 
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.widget.FrameLayout;
+import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
@@ -126,7 +126,6 @@ public class MyActivity extends AppCompatActivity {
     }
 
     int adWidth = (int) (adWidthPixels / density);
-
-    return AdSize.getCurrentOrientationBannerAdSizeWithWidth(this, adWidth);
+    return AdSize.getCurrentOrientationInlineAdaptiveBannerAdSize(this, adWidth);
   }
 }

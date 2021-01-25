@@ -17,21 +17,6 @@
             android:layout_marginTop="16dp" />
 
         <CheckBox
-            android:id="@+id/nativeads_checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:checked="true"
-            android:text="Request Unified Native Ads" />
-
-        <CheckBox
-            android:id="@+id/customtemplate_checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="Request Custom Template Ads" />
-
-        <CheckBox
             android:id="@+id/start_muted_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
